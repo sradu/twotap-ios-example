@@ -23,7 +23,7 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
 @property (weak, nonatomic) IBOutlet UIButton *closeButton;
 
-- (IBAction)closeModal:(id)sender;
+- (void)closeModal;
 
 @end
 
@@ -46,25 +46,13 @@
   self.loadingIndicator.layer.cornerRadius = 6;
   
   [self.loadingIndicator startAnimating];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-  [super viewWillAppear:animated];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-  [super viewWillDisappear:animated];
   
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidHideNotification object:nil];
+  [self checkPostMessages];
 }
 
-- (BOOL)prefersStatusBarHidden {
+
+- (BOOL)prefersStatusBarHidden
+{
   return YES;
 }
 
@@ -80,18 +68,26 @@
 }
 
 
-- (void)keyboardWillShow:(NSNotification *)n
+
+-(void)checkPostMessages
 {
-  self.closeButton.hidden = YES;
+  NSString *messagesJSON = [self.ttWebView stringByEvaluatingJavaScriptFromString:@"postMessagesJSON()"];
+  
+  NSArray *messages = [NSJSONSerialization
+               JSONObjectWithData:[messagesJSON dataUsingEncoding:NSUTF8StringEncoding]
+               options:0
+               error:nil];
+  
+  for (NSDictionary *message in messages) {
+    if ([message[@"action"] isEqual: @"close_pressed"]) {
+      [self closeModal];
+    }
+  }
+  
+  [self performSelector:@selector(checkPostMessages) withObject:nil afterDelay:0.3];
 }
 
-- (void)keyboardDidHide:(NSNotification *)n
-{
-  self.closeButton.hidden = NO;
-}
-
-
-- (IBAction)closeModal:(id)sender
+- (void)closeModal
 {
   
   UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Your progress will be lost. Are you sure you want to close the checkout?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
