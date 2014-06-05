@@ -105,5 +105,27 @@
 }
 
 
+// Avoid opening Out of Stock and other outside links inside this UIWebView.
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+  
+  // Whitelist URLs that can be opened inside this UIWebView. Like the URL to your opener iframe.
+  NSArray *localURLs = @[@"checkout.twotap.com", @"localhost"];
+  
+  NSString *reqURL = request.URL.absoluteString;
+  BOOL openInSafari = YES;
+  
+  for (NSString *url in localURLs) {
+    if ([reqURL rangeOfString:url].location != NSNotFound ) {
+      openInSafari = NO;
+    }
+  }
+  
+  if (openInSafari) {
+    [[UIApplication sharedApplication] openURL:request.URL];
+    return false;
+  } else {
+    return true;
+  }
+}
 
 @end
