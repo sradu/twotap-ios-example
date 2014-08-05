@@ -35,18 +35,17 @@
 {
   [[self.ttWebView scrollView] setBounces: NO];
   
-  // Load the POST creating form in the Two Tap desktop example with a custom CSS file:
+  // Load the POST creating form from the Two Tap desktop example with a custom CSS file:
   // https://github.com/sradu/twotap-web-example/blob/master/views/integration_iframe.ejs
   NSString *customCSSURL = @"http://localhost:2500/stylesheets/integration_twotap_ios.css";
-  
   NSString *ttPath = [NSString stringWithFormat:@"http://localhost:2500/integration_iframe?custom_css_url=%@&product=%@",  customCSSURL, self.productUrl];
   
   NSURL *ttURL = [NSURL URLWithString:ttPath];
   NSURLRequest *ttRequestObj = [NSURLRequest requestWithURL:ttURL];
   [self.ttWebView loadRequest:ttRequestObj];
   
+  // Show a loading indicator while we load the initial iframe.
   self.loadingIndicator.layer.cornerRadius = 6;
-  
   [self.loadingIndicator startAnimating];
   
   // Always check for postMessages from Two Tap.
@@ -62,8 +61,9 @@
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
+  // Hide the loadingIndicator.
   [self.loadingIndicator stopAnimating];
-  
+
   // After the UIWebView finishes loading we can hide the fake top bar.
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
     self.loadingTopBarView.hidden = YES;
@@ -95,7 +95,6 @@
 
 - (void)closeModal
 {
-  
   UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Your progress will be lost. Are you sure you want to close the checkout?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
   [message show];
 }
