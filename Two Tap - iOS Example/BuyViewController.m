@@ -35,6 +35,8 @@
 {
   [[self.ttWebView scrollView] setBounces: NO];
   
+  // Load the POST creating form in the Two Tap desktop example with a custom CSS file:
+  // https://github.com/sradu/twotap-web-example/blob/master/views/integration_iframe.ejs
   NSString *customCSSURL = @"http://localhost:2500/stylesheets/integration_twotap_ios.css";
   
   NSString *ttPath = [NSString stringWithFormat:@"http://localhost:2500/integration_iframe?custom_css_url=%@&product=%@",  customCSSURL, self.productUrl];
@@ -47,6 +49,7 @@
   
   [self.loadingIndicator startAnimating];
   
+  // Always check for postMessages from Two Tap.
   [self checkPostMessages];
 }
 
@@ -56,19 +59,21 @@
   return YES;
 }
 
+
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
   [self.loadingIndicator stopAnimating];
   
+  // After the UIWebView finishes loading we can hide the fake top bar.
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-    
     self.loadingTopBarView.hidden = YES;
     self.loadingTopBarTitleLabel.hidden = YES;
   });
 }
 
 
-
+// Two Tap sends different postMessage events. We can catch interesting ones
+// (like close_pressed, cart_finalized) here and performs actions based on them.
 -(void)checkPostMessages
 {
   NSString *messagesJSON = [self.ttWebView stringByEvaluatingJavaScriptFromString:@"postMessagesJSON()"];
@@ -86,6 +91,7 @@
   
   [self performSelector:@selector(checkPostMessages) withObject:nil afterDelay:0.3];
 }
+
 
 - (void)closeModal
 {
