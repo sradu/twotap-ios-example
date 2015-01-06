@@ -30,7 +30,7 @@
   
   if ([segue.identifier isEqual:@"checkout"]) {
     BuyViewController *vc = (BuyViewController *)segue.destinationViewController;
-    vc.productUrl = @"http://www.nastygal.com/clothes-dresses/reverse-acid-dress";
+    vc.productUrl = @"http://www.nastygal.com/clothes-dresses/reverse-havana-lace-dress--black";
     
   } else {
     NSAssert(NO, @"Unknown segue. All segues must be handled.");

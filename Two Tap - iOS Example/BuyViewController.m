@@ -47,17 +47,19 @@
   // Show a loading indicator while we load the initial iframe.
   self.loadingIndicator.layer.cornerRadius = 6;
   [self.loadingIndicator startAnimating];
-  
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
   // Always check for postMessages from Two Tap.
   [self checkPostMessages];
 }
-
 
 - (BOOL)prefersStatusBarHidden
 {
   return YES;
 }
-
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
@@ -88,8 +90,10 @@
       [self closeModal];
     }
   }
-  
-  [self performSelector:@selector(checkPostMessages) withObject:nil afterDelay:0.3];
+
+  if (self.isViewLoaded && self.view.window) {
+    [self performSelector:@selector(checkPostMessages) withObject:nil afterDelay:0.3];
+  }
 }
 
 

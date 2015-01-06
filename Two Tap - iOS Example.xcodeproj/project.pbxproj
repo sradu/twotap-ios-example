@@ -218,6 +218,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Radu Spineanu";
 				TargetAttributes = {
+					CF91261818EF92FB00AA5C16 = {
+						DevelopmentTeam = BDGWTU38T3;
+					};
 					CF91263C18EF92FB00AA5C16 = {
 						TestTargetID = CF91261818EF92FB00AA5C16;
 					};
@@ -478,6 +481,7 @@
 				CF91265018EF92FB00AA5C16 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CF91265118EF92FB00AA5C16 /* Build configuration list for PBXNativeTarget "Two Tap - iOS ExampleTests" */ = {
 			isa = XCConfigurationList;
@@ -486,6 +490,7 @@
 				CF91265318EF92FB00AA5C16 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
