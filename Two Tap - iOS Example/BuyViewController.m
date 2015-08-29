@@ -17,11 +17,7 @@
 
 @property (weak, nonatomic) IBOutlet UIWebView *ttWebView;
 
-@property (weak, nonatomic) IBOutlet UIView *loadingTopBarView;
-
-@property (weak, nonatomic) IBOutlet UILabel *loadingTopBarTitleLabel;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingIndicator;
-@property (weak, nonatomic) IBOutlet UIButton *closeButton;
 
 - (void)closeModal;
 
@@ -31,53 +27,47 @@
 
 @synthesize productUrl;
 
-- (void)viewDidLoad
-{
+
+- (void)viewDidLoad {
   [[self.ttWebView scrollView] setBounces: NO];
+  
+  NSString *encodedProductUrl = [self encodeUrlString:self.productUrl];
   
   // Load the POST creating form from the Two Tap desktop example with a custom CSS file:
   // https://github.com/sradu/twotap-web-example/blob/master/views/integration_iframe.ejs
   NSString *customCSSURL = @"http://localhost:2500/stylesheets/integration_twotap_ios.css";
-  NSString *ttPath = [NSString stringWithFormat:@"http://localhost:2500/integration_iframe?custom_css_url=%@&product=%@",  customCSSURL, self.productUrl];
+  NSString *ttPath = [NSString stringWithFormat:@"http://localhost:2500/integration_iframe?custom_css_url=%@&product=%@",  customCSSURL, encodedProductUrl];
   
   NSURL *ttURL = [NSURL URLWithString:ttPath];
   NSURLRequest *ttRequestObj = [NSURLRequest requestWithURL:ttURL];
   [self.ttWebView loadRequest:ttRequestObj];
   
   // Show a loading indicator while we load the initial iframe.
-  self.loadingIndicator.layer.cornerRadius = 6;
   [self.loadingIndicator startAnimating];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
   [super viewDidAppear:animated];
   // Always check for postMessages from Two Tap.
   [self checkPostMessages];
 }
 
-- (BOOL)prefersStatusBarHidden
-{
+- (BOOL)prefersStatusBarHidden {
   return YES;
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
-  // Hide the loadingIndicator.
-  [self.loadingIndicator stopAnimating];
-
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
   // After the UIWebView finishes loading we can hide the fake top bar.
-  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-    self.loadingTopBarView.hidden = YES;
-    self.loadingTopBarTitleLabel.hidden = YES;
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+    // Hide the loadingIndicator.
+    [self.loadingIndicator stopAnimating];
   });
 }
 
 
 // Two Tap sends different postMessage events. We can catch interesting ones
 // (like close_pressed, cart_finalized) here and performs actions based on them.
--(void)checkPostMessages
-{
+-(void)checkPostMessages {
   NSString *messagesJSON = [self.ttWebView stringByEvaluatingJavaScriptFromString:@"postMessagesJSON()"];
   
   NSArray *messages = [NSJSONSerialization
@@ -97,15 +87,13 @@
 }
 
 
-- (void)closeModal
-{
+- (void)closeModal {
   UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Your progress will be lost. Are you sure you want to close the checkout?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
   [message show];
 }
 
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex != 1) {
     return;
   }
@@ -135,6 +123,19 @@
   } else {
     return true;
   }
+}
+
+
+// URL encoding
+- (NSString *)encodeUrlString:(NSString *)string {
+  return CFBridgingRelease(
+                           CFURLCreateStringByAddingPercentEscapes(
+                                                                   kCFAllocatorDefault,
+                                                                   (__bridge CFStringRef)string,
+                                                                   NULL,
+                                                                   CFSTR("!*'();:@&=+$,/?%#[]"),
+                                                                   kCFStringEncodingUTF8)
+                           );
 }
 
 @end

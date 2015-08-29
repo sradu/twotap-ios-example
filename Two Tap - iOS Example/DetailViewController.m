@@ -16,8 +16,7 @@
 @implementation DetailViewController
 
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
   
   self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
@@ -25,12 +24,11 @@
 }
 
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   
   if ([segue.identifier isEqual:@"checkout"]) {
     BuyViewController *vc = (BuyViewController *)segue.destinationViewController;
-    vc.productUrl = @"http://www.nastygal.com/clothes-dresses/reverse-havana-lace-dress--black";
+    vc.productUrl = @"http://www.forever21.com/Product/Product.aspx?BR=f21&Category=sweater_sweatshirts-hoodies&ProductID=2000083990&VariantID=";
     
   } else {
     NSAssert(NO, @"Unknown segue. All segues must be handled.");
